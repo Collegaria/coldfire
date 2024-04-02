@@ -44,8 +44,8 @@ def handle_events():
 def main():
     pygame.init()
 
-    SCREEN_WIDTH = 600
-    SCREEN_HEIGHT = 400
+    SCREEN_WIDTH = 900
+    SCREEN_HEIGHT = 600
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Moving Circle")
 
@@ -63,11 +63,11 @@ def main():
     MAP = [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-        [1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1],
-        [1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 2, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1, 1, 1, 0, 2, 0, 0, 0, 0, 1, 0, 1],
         [1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
-        [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
+        [1, 0, 1, 2, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ]
 
@@ -96,12 +96,14 @@ def main():
         if keys[pygame.K_DOWN]:
             dy += circle.speed
 
-        circle.move(dx, dy)
+        #circle.move(dx, dy)
 
-        # circle.x = SCREEN_WIDTH // 2
-        # circle.y = SCREEN_HEIGHT // 2
+        circle.x = SCREEN_WIDTH // 2
+        circle.y = SCREEN_HEIGHT // 2
         
         for obstacle in obstacles:
+            obstacle.rect.x -= dx
+            obstacle.rect.y -= dy
             obstacle.draw()
 
         circle.draw()
