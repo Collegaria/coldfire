@@ -11,6 +11,9 @@ class Player:
 
     def draw(self):
         pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.radius)
+        
+    def pick_sticker(self, stick):
+        return 0
 
     def move(self, dx, dy):
         self.x += dx
