@@ -1,39 +1,7 @@
 import pygame
 import sys
-
-class Circle:
-    def __init__(self, screen, color, radius, x, y, speed):
-        self.screen = screen
-        self.color = color
-        self.radius = radius
-        self.x = x
-        self.y = y
-        self.speed = speed
-
-    def draw(self):
-        pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.radius)
-
-    def move(self, dx, dy):
-        self.x += dx
-        self.y += dy
-
-class BackgroundElement:
-    def __init__(self, screen, color, rect):
-        self.screen = screen
-        self.color = color
-        self.rect = rect
-
-    def draw(self):
-        pygame.draw.rect(self.screen, self.color, self.rect)
-
-class Obstacle:
-    def __init__(self, screen, color, rect):
-        self.screen = screen
-        self.color = color
-        self.rect = rect
-
-    def draw(self):
-        pygame.draw.rect(self.screen, self.color, self.rect)
+from modules.player import Player
+from modules.world import Obstacle
 
 def handle_events():
     for event in pygame.event.get():
@@ -54,11 +22,9 @@ def main():
     BLACK = (0, 0, 0)
     GREEN = (0, 255, 0)
 
-    circle_radius = 20
-    circle_x = SCREEN_WIDTH // 2
-    circle_y = SCREEN_HEIGHT // 2
-    circle_speed = 5
-    circle = Circle(screen, WHITE, circle_radius, circle_x, circle_y, circle_speed)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    player = Player(screen, WHITE, 20, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 5)
+
 
     MAP = [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -71,16 +37,17 @@ def main():
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ]
 
-    CELL_SIZE = 40
-    obstacles = []
+    CELL_SIZE = 20
+    world = []
     for y, row in enumerate(MAP):
         for x, cell in enumerate(row):
             if cell == 1:  # Wall
-                obstacles.append(Obstacle(screen, BLACK, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                world.append(Obstacle(screen, BLACK, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 2:  # Tree
-                obstacles.append(Obstacle(screen, GREEN, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                world.append(Obstacle(screen, GREEN, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
 
     running = True
+
     while running:
         screen.fill(MAUVE)
         running = handle_events()
@@ -88,25 +55,24 @@ def main():
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
         if keys[pygame.K_LEFT]:
-            dx -= circle.speed
+            dx -= player.speed
         if keys[pygame.K_RIGHT]:
-            dx += circle.speed
+            dx += player.speed
         if keys[pygame.K_UP]:
-            dy -= circle.speed
+            dy -= player.speed
         if keys[pygame.K_DOWN]:
-            dy += circle.speed
+            dy += player.speed
 
-        #circle.move(dx, dy)
 
-        circle.x = SCREEN_WIDTH // 2
-        circle.y = SCREEN_HEIGHT // 2
+        player.x = SCREEN_WIDTH // 2
+        player.y = SCREEN_HEIGHT // 2
         
-        for obstacle in obstacles:
+        for obstacle in world:
             obstacle.rect.x -= dx
             obstacle.rect.y -= dy
             obstacle.draw()
 
-        circle.draw()
+        player.draw()
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)
