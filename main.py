@@ -5,18 +5,6 @@ from modules.player import Player
 from modules.world import Obstacle
 from modules.events import *
 
-def spawn_trees_blocks(map, num_blocks, block_value=2):
-    rows = len(map)
-    cols = len(map[0])
-    for _ in range(num_blocks):
-        placed = False
-        while not placed:
-            x = random.randint(0, cols - 1)
-            y = random.randint(0, rows - 1)
-            if map[y][x] == 0:  # Check if the position is empty
-                map[y][x] = block_value  # Place a green block
-                placed = True
-
 def main():
     pygame.init()
 
@@ -25,22 +13,21 @@ def main():
     MAUVE = (224, 176, 255)
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
-    BLUE = (0, 0, 255)
+    BROWN = (139, 69, 19)
     GREEN = (0, 255, 0)
     BAR_VALUE = 50  # Starting at 100%
     CELL_SIZE = 20
     MAP_SIZE = 100
     center = MAP_SIZE // 2
     
-    pygame.display.set_caption("Moving Circle")
+    pygame.display.set_caption("coldFire")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     
     player = Player(screen, WHITE, 20, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 5)
-    player.x = SCREEN_WIDTH // 2
-    player.y = SCREEN_HEIGHT // 2
 
     MAP = [[0 if x > 0 and x < MAP_SIZE-1 and y > 0 and y < MAP_SIZE-1 else 1 for x in range(MAP_SIZE)] for y in range(MAP_SIZE)]
-    spawn_trees_blocks(MAP, 80, 2)
+    
+    #! House
     for y in range(center - 2, center + 2):
         for x in range(center - 2, center + 2):
             MAP[y][x] = 3  # Representing the blue block
@@ -54,14 +41,16 @@ def main():
 
 
     world = []
+    Obstacle.spawn_trees_blocks(MAP, 80, 2)
+    Obstacle.spawn_sticks(MAP, 20, 4)
     for y, row in enumerate(MAP):
         for x, cell in enumerate(row):
             if cell == 1:  # Wall
                 world.append(Obstacle(screen, BLACK, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 2:  # Tree
                 world.append(Obstacle(screen, GREEN, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
-            elif cell == 3:
-                world.append(Obstacle(screen, BLUE, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+            elif cell == 4:
+                world.append(Obstacle(screen, BROWN, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
 
     # Timer Bar Variables
     last_update_time = pygame.time.get_ticks()  # Get the initial time
@@ -90,7 +79,8 @@ def main():
             centered_x = obstacle.rect.x + offset_x
             centered_y = obstacle.rect.y + offset_y
             # Draw the obstacle at the new, centered position
-            pygame.draw.rect(screen, obstacle.color, pygame.Rect(centered_x, centered_y, CELL_SIZE, CELL_SIZE))
+            obstacle.draw(centered_x, centered_y, CELL_SIZE)
+            #pygame.draw.rect(screen, obstacle.color, pygame.Rect(centered_x, centered_y, CELL_SIZE, CELL_SIZE))
 
         #! Timer Bar
         current_time = pygame.time.get_ticks()
