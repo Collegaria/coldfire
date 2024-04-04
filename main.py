@@ -5,19 +5,20 @@ from modules.player import Player
 from modules.world import Obstacle
 from modules.events import *
 
+SCREEN_WIDTH = 900
+SCREEN_HEIGHT = 600
+MAUVE = (224, 176, 255)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BROWN = (139, 69, 19)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+BAR_VALUE = 50  # Starting at 100%
+CELL_SIZE = 20
+MAP_SIZE = 100
+
 def main():
     pygame.init()
-
-    SCREEN_WIDTH = 900
-    SCREEN_HEIGHT = 600
-    MAUVE = (224, 176, 255)
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-    BROWN = (139, 69, 19)
-    GREEN = (0, 255, 0)
-    BAR_VALUE = 50  # Starting at 100%
-    CELL_SIZE = 20
-    MAP_SIZE = 100
     center = MAP_SIZE // 2
     
     pygame.display.set_caption("coldFire")
@@ -49,6 +50,8 @@ def main():
                 world.append(Obstacle(screen, BLACK, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 2:  # Tree
                 world.append(Obstacle(screen, GREEN, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+            elif cell == 3:
+                world.append(Obstacle(screen, BLUE, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 4:
                 world.append(Obstacle(screen, BROWN, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
 
