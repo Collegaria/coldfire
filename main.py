@@ -8,7 +8,9 @@ from button import Button
 
 pygame.init()
 
-SCREEN = pygame.display.set_mode((1280, 720))
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Menu")
 
 BG = pygame.image.load("assets/Background.png")
@@ -16,14 +18,12 @@ BG = pygame.image.load("assets/Background.png")
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/font.ttf", size)
 
-SCREEN_WIDTH = 900
-SCREEN_HEIGHT = 600
-MAUVE = (224, 176, 255)
+MAUVE = (176, 224, 230)
 WHITE = (255, 255, 255)
 # Update colors to use images
-BLACK = (0, 0, 0)
+BLACK = (30, 32, 48)
 BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
+GREEN = (166, 218, 149)
 BAR_VALUE = 60
 CELL_SIZE = 60
 MAP_SIZE = 50
@@ -41,6 +41,7 @@ frosBorder_image = pygame.transform.scale(pygame.image.load("assets/frosBorder.p
 frostree_image = pygame.transform.scale(pygame.image.load("assets/frostree.png"), (LARGE_CELL_SIZE, LARGE_CELL_SIZE))
 Stick_image = pygame.transform.scale(pygame.image.load("assets/stick.png"), (LARGE_CELL_SIZE/2, LARGE_CELL_SIZE/2))
 dragon_image = pygame.transform.scale(pygame.image.load("assets/Dragon.png"), TARGET_SIZE)
+house_image = pygame.transform.scale(pygame.image.load("assets/house.png"), (LARGE_CELL_SIZE*2, LARGE_CELL_SIZE*2))
 
 def play():
     global STICKS
@@ -57,9 +58,9 @@ def play():
     MAP = [[0 if x > 0 and x < MAP_SIZE-1 and y > 0 and y < MAP_SIZE-1 else 1 for x in range(MAP_SIZE)] for y in range(MAP_SIZE)]
     
     # House
-    for y in range(center - 1, center + 1):
-        for x in range(center - 1, center + 1):
-            MAP[y][x] = 3  # Representing the house with a specific image (if needed)
+    house_x, house_y = MAP_SIZE // 2, MAP_SIZE // 2
+
+    MAP[house_y][house_x] = 3  # Only one cell is set for the house
     
     map_width = len(MAP[0]) * CELL_SIZE
     map_height = len(MAP) * CELL_SIZE
@@ -77,11 +78,12 @@ def play():
             elif cell == 2:  # Tree
                 world.append(Obstacle(screen, frostree_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 3:
-                world.append(Obstacle(screen, dragon_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
-            elif cell == 4:
-                Stick_img = pygame.transform.rotate(Stick_image, random.randint(0, 360))
-                
-                world.append(Obstacle(screen, Stick_img, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                world.append(Obstacle(screen, house_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+    for _ in range(20):
+            rand_x = random.randint(0, MAP_SIZE - 1) * CELL_SIZE
+            rand_y = random.randint(0, MAP_SIZE - 1) * CELL_SIZE
+            Stick_img = pygame.transform.rotate(Stick_image, random.randint(0, 360))
+            world.append(Obstacle(screen, Stick_img, pygame.Rect(rand_x, rand_y, CELL_SIZE, CELL_SIZE)))
 
     # Timer Bar Variables
     last_update_time = pygame.time.get_ticks()  # Get the initial time
@@ -114,15 +116,11 @@ def play():
             centered_y = obstacle.rect.y + offset_y
             # Draw the obstacle at the new, centered position
             obstacle.draw(centered_x, centered_y, CELL_SIZE)
-            
-        obstacles_to_remove = []
-        for obstacle in world:
-            if obstacle.image == Stick_image and player.rect.colliderect(obstacle.rect):
-                world.remove(obstacle)  # Remove the stick from the game world
-                STICKS += 1  # Increment the STICKS counter
-        
-        print(STICKS)
-
+        for obstacle in world[:]:  # Iterate over a copy of the list to safely remove items
+                if obstacle.image == Stick_image and player.rect.colliderect(obstacle.rect):
+                    print(STICKS)
+                    world.remove(obstacle)  # Remove the stick from the game world
+                    STICKS += 1  # Increment the STICKS counter
         # Timer Bar
         current_time = pygame.time.get_ticks()
         last_update_time, BAR_VALUE = update_timer_bar(last_update_time, current_time, BAR_VALUE)        
