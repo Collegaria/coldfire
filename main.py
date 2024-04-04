@@ -20,13 +20,28 @@ SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 600
 MAUVE = (224, 176, 255)
 WHITE = (255, 255, 255)
+# Update colors to use images
 BLACK = (0, 0, 0)
-BROWN = (139, 69, 19)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
-BAR_VALUE = 50  # Starting at 100%
-CELL_SIZE = 20
-MAP_SIZE = 100
+BAR_VALUE = 60
+CELL_SIZE = 60
+MAP_SIZE = 50
+STICKS = 0
+
+
+# Load new images for player and obstacles
+# Define the target size for your images
+TARGET_SIZE = [CELL_SIZE, CELL_SIZE]
+TREE_BORDER_SCALE_FACTOR = 4
+LARGE_CELL_SIZE = int(CELL_SIZE * TREE_BORDER_SCALE_FACTOR)
+# Load and scale images
+player_image_left = pygame.transform.scale(pygame.image.load("assets/LincstepsL.png"), TARGET_SIZE)
+player_image_right = pygame.transform.scale(pygame.image.load("assets/LincstepsR.png"), TARGET_SIZE)
+frosBorder_image = pygame.transform.scale(pygame.image.load("assets/frosBorder.png"), (LARGE_CELL_SIZE, LARGE_CELL_SIZE))
+frostree_image = pygame.transform.scale(pygame.image.load("assets/frostree.png"), (LARGE_CELL_SIZE, LARGE_CELL_SIZE))
+StickSubstitute_image = pygame.transform.scale(pygame.image.load("assets/StickSubstitute.png"), TARGET_SIZE)
+dragon = pygame.transform.scale(pygame.image.load("assets/Dragon.png"), TARGET_SIZE)
 
 def play():
     pygame.init()
@@ -36,14 +51,14 @@ def play():
     pygame.display.set_caption("coldFire")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     
-    player = Player(screen, WHITE, 20, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 5)
+    player = Player(screen, WHITE, 20, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 5, player_image_left)
 
     MAP = [[0 if x > 0 and x < MAP_SIZE-1 and y > 0 and y < MAP_SIZE-1 else 1 for x in range(MAP_SIZE)] for y in range(MAP_SIZE)]
     
     # House
-    for y in range(center - 2, center + 2):
-        for x in range(center - 2, center + 2):
-            MAP[y][x] = 3  # Representing the blue block
+    for y in range(center - 1, center + 1):
+        for x in range(center - 1, center + 1):
+            MAP[y][x] = 3  # Representing the house with a specific image (if needed)
     
     map_width = len(MAP[0]) * CELL_SIZE
     map_height = len(MAP) * CELL_SIZE
@@ -53,17 +68,17 @@ def play():
 
     world = []
     Obstacle.spawn_trees_blocks(MAP, 80, 2)
-    Obstacle.spawn_sticks(MAP, 20, 4)
+    Obstacle.spawn_sticks(MAP, 60, 4)
     for y, row in enumerate(MAP):
         for x, cell in enumerate(row):
             if cell == 1:  # Wall
-                world.append(Obstacle(screen, BLACK, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                world.append(Obstacle(screen, frosBorder_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 2:  # Tree
-                world.append(Obstacle(screen, GREEN, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                world.append(Obstacle(screen, frostree_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 3:
-                world.append(Obstacle(screen, BLUE, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                world.append(Obstacle(screen, dragon, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 4:
-                world.append(Obstacle(screen, BROWN, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                world.append(Obstacle(screen, StickSubstitute_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
 
     # Timer Bar Variables
     last_update_time = pygame.time.get_ticks()  # Get the initial time
@@ -77,8 +92,10 @@ def play():
         dx, dy = 0, 0
         if keys[pygame.K_LEFT]:
             dx -= player.speed
+            player.current_image = player_image_left
         if keys[pygame.K_RIGHT]:
             dx += player.speed
+            player.current_image = player_image_right
         if keys[pygame.K_UP]:
             dy -= player.speed
         if keys[pygame.K_DOWN]:
@@ -93,27 +110,21 @@ def play():
             centered_y = obstacle.rect.y + offset_y
             # Draw the obstacle at the new, centered position
             obstacle.draw(centered_x, centered_y, CELL_SIZE)
-        # Inside the main game loop in play()
-        for obstacle in world[:]:  # Iterate over a copy of the list to safely remove items
-            if obstacle.color == BROWN and player.colliderect(obstacle.rect):
-                player.pick_sticker()
+        for obstacle in world[:]:
+            if obstacle.image == StickSubstitute_image and player.colliderect(obstacle.rect):
                 world.remove(obstacle)  # Remove the stick from the game world
-            elif obstacle.color == BLUE and player.colliderect(obstacle.rect):
-                BAR_VALUE = 50  # Reset the bar value or as needed
+                STICKS += 1  # Increment the STICKS counter
 
         # Timer Bar
         current_time = pygame.time.get_ticks()
-        last_update_time, BAR_VALUE = update_timer_bar(last_update_time, current_time, BAR_VALUE)
-        
+        last_update_time, BAR_VALUE = update_timer_bar(last_update_time, current_time, BAR_VALUE)        
         # Draw the timer bar
         bar_width = 400  # Example width of the bar
         bar_height = 20  # Example height of the bar
         bar_x = (SCREEN_WIDTH - bar_width) // 2  # Center the bar
         bar_y = 10  # Position the bar at the top of the screen
-
         # Calculate the width of the bar based on the current value
         current_bar_width = (BAR_VALUE / 100) * bar_width
-
         # Draw the background of the bar (optional, for visual contrast)
         pygame.draw.rect(screen, BLACK, [bar_x, bar_y, bar_width, bar_height], 0)
         # Draw the current value of the bar
@@ -127,6 +138,8 @@ def play():
     pygame.quit()
     sys.exit()
 
+# The rest of the main_menu function remains unchanged
+
 def main_menu():
     while True:
         SCREEN.blit(BG, (0, 0))
@@ -138,14 +151,12 @@ def main_menu():
 
         PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 250), 
                             text_input="PLAY", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
-        OPTIONS_BUTTON = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 400), 
-                            text_input="OPTIONS", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
         QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(640, 550), 
                             text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
 
         SCREEN.blit(MENU_TEXT, MENU_RECT)
 
-        for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+        for button in [PLAY_BUTTON, QUIT_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
             button.update(SCREEN)
         
@@ -156,8 +167,6 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     play()
-                if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    options()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()

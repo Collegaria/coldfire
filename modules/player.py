@@ -1,18 +1,17 @@
 import pygame
 
 class Player:
-    def __init__(self, screen, color, radius, x, y, speed):
+    def __init__(self, screen, color, size, x, y, speed, image):
         self.screen = screen
-        self.color = color
-        self.radius = radius
+        self.color = color  # This might be unused if you're switching to image rendering
+        self.size = size
         self.x = x
         self.y = y
         self.speed = speed
+        self.image = image  # New attribute for the player's image
 
     def draw(self):
-        side_length = self.size * 2  # Example conversion, adjust as needed
-        square_rect = pygame.Rect(self.x - self.size, self.y - self.size, side_length, side_length)
-        pygame.draw.rect(self.screen, self.color, square_rect)
+        self.screen.blit(self.image, (self.x, self.y))
         
     def pick_sticker(self):
         self.sticks_collected += 1  # Assuming sticks_collected is the counter for sticks
