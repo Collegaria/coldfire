@@ -116,7 +116,7 @@ def play():
             obstacle.draw(centered_x, centered_y, CELL_SIZE)
             
         obstacles_to_remove = []
-        for obstacle in world[:]:
+        for obstacle in world:
             if obstacle.image == Stick_image and player.rect.colliderect(obstacle.rect):
                 world.remove(obstacle)  # Remove the stick from the game world
                 STICKS += 1  # Increment the STICKS counter
@@ -145,8 +145,6 @@ def play():
 
     pygame.quit()
     sys.exit()
-
-# The rest of the main_menu function remains unchanged
 
 def main_menu():
     while True:
