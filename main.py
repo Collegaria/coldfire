@@ -93,6 +93,13 @@ def play():
             centered_y = obstacle.rect.y + offset_y
             # Draw the obstacle at the new, centered position
             obstacle.draw(centered_x, centered_y, CELL_SIZE)
+        # Inside the main game loop in play()
+        for obstacle in world[:]:  # Iterate over a copy of the list to safely remove items
+            if obstacle.color == BROWN and player.colliderect(obstacle.rect):
+                player.pick_sticker()
+                world.remove(obstacle)  # Remove the stick from the game world
+            elif obstacle.color == BLUE and player.colliderect(obstacle.rect):
+                BAR_VALUE = 50  # Reset the bar value or as needed
 
         # Timer Bar
         current_time = pygame.time.get_ticks()
