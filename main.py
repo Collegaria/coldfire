@@ -17,7 +17,7 @@ BAR_VALUE = 50  # Starting at 100%
 CELL_SIZE = 20
 MAP_SIZE = 100
 
-def main():
+def play():
     pygame.init()
     center = MAP_SIZE // 2
     
@@ -28,7 +28,7 @@ def main():
 
     MAP = [[0 if x > 0 and x < MAP_SIZE-1 and y > 0 and y < MAP_SIZE-1 else 1 for x in range(MAP_SIZE)] for y in range(MAP_SIZE)]
     
-    #! House
+    # House
     for y in range(center - 2, center + 2):
         for x in range(center - 2, center + 2):
             MAP[y][x] = 3  # Representing the blue block
@@ -74,7 +74,7 @@ def main():
         if keys[pygame.K_DOWN]:
             dy += player.speed
 
-        #! Obstacles
+        # Obstacles
         for obstacle in world:
             obstacle.rect.x -= dx
             obstacle.rect.y -= dy
@@ -83,9 +83,8 @@ def main():
             centered_y = obstacle.rect.y + offset_y
             # Draw the obstacle at the new, centered position
             obstacle.draw(centered_x, centered_y, CELL_SIZE)
-            #pygame.draw.rect(screen, obstacle.color, pygame.Rect(centered_x, centered_y, CELL_SIZE, CELL_SIZE))
 
-        #! Timer Bar
+        # Timer Bar
         current_time = pygame.time.get_ticks()
         last_update_time, BAR_VALUE = update_timer_bar(last_update_time, current_time, BAR_VALUE)
         
@@ -103,7 +102,6 @@ def main():
         # Draw the current value of the bar
         pygame.draw.rect(screen, GREEN, [bar_x, bar_y, current_bar_width, bar_height], 0)
 
-
         player.draw()
 
         pygame.display.flip()
@@ -111,6 +109,9 @@ def main():
 
     pygame.quit()
     sys.exit()
+
+def main():
+    play()
 
 if __name__ == "__main__":
     main()
