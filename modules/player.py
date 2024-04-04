@@ -9,7 +9,8 @@ class Player:
         self.y = y
         self.speed = speed
         self.image = image  # New attribute for the player's image
-
+        self.rect = pygame.Rect(x, y, size, size)  # Assuming size is both width and height
+    
     def draw(self):
         self.screen.blit(self.image, (self.x, self.y))
         

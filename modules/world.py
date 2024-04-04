@@ -1,8 +1,5 @@
 import pygame
 import random
-import pygame
-
-import pygame
 
 class Obstacle:
     def __init__(self, screen, image, rect):
@@ -15,6 +12,8 @@ class Obstacle:
         # Note: Assuming the image size matches the cell size. If not, you might need to scale the image.
         self.screen.blit(self.image, (x, y))
 
+class World:
+    @staticmethod
     def spawn_trees_blocks(map, num_blocks, block_value=2):
         rows = len(map)
         cols = len(map[0])
@@ -27,6 +26,7 @@ class Obstacle:
                     map[y][x] = block_value
                     placed = True
     
+    @staticmethod
     def spawn_sticks(map, num_sticks, block_value=4):
         rows = len(map)
         cols = len(map[0])

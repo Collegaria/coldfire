@@ -2,7 +2,7 @@ import pygame
 import random
 import sys
 from modules.player import Player
-from modules.world import Obstacle
+from modules.world import *
 from modules.events import *
 from button import Button 
 
@@ -27,7 +27,6 @@ GREEN = (0, 255, 0)
 BAR_VALUE = 60
 CELL_SIZE = 60
 MAP_SIZE = 50
-STICKS = 0
 
 
 # Load new images for player and obstacles
@@ -40,10 +39,12 @@ player_image_left = pygame.transform.scale(pygame.image.load("assets/LincstepsL.
 player_image_right = pygame.transform.scale(pygame.image.load("assets/LincstepsR.png"), TARGET_SIZE)
 frosBorder_image = pygame.transform.scale(pygame.image.load("assets/frosBorder.png"), (LARGE_CELL_SIZE, LARGE_CELL_SIZE))
 frostree_image = pygame.transform.scale(pygame.image.load("assets/frostree.png"), (LARGE_CELL_SIZE, LARGE_CELL_SIZE))
-StickSubstitute_image = pygame.transform.scale(pygame.image.load("assets/StickSubstitute.png"), TARGET_SIZE)
-dragon = pygame.transform.scale(pygame.image.load("assets/Dragon.png"), TARGET_SIZE)
+Stick_image = pygame.transform.scale(pygame.image.load("assets/stick.png"), (LARGE_CELL_SIZE/2, LARGE_CELL_SIZE/2))
+dragon_image = pygame.transform.scale(pygame.image.load("assets/Dragon.png"), TARGET_SIZE)
 
 def play():
+    global STICKS
+    STICKS = 0
     pygame.init()
     center = MAP_SIZE // 2
     BAR_VALUE = 50  # Starting at 100%
@@ -67,8 +68,8 @@ def play():
     offset_y = (SCREEN_HEIGHT - map_height) // 2
 
     world = []
-    Obstacle.spawn_trees_blocks(MAP, 80, 2)
-    Obstacle.spawn_sticks(MAP, 60, 4)
+    World.spawn_trees_blocks(MAP, 80, 2)
+    World.spawn_sticks(MAP, 60, 4)
     for y, row in enumerate(MAP):
         for x, cell in enumerate(row):
             if cell == 1:  # Wall
@@ -76,9 +77,11 @@ def play():
             elif cell == 2:  # Tree
                 world.append(Obstacle(screen, frostree_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 3:
-                world.append(Obstacle(screen, dragon, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                world.append(Obstacle(screen, dragon_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
             elif cell == 4:
-                world.append(Obstacle(screen, StickSubstitute_image, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
+                Stick_img = pygame.transform.rotate(Stick_image, random.randint(0, 360))
+                
+                world.append(Obstacle(screen, Stick_img, pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)))
 
     # Timer Bar Variables
     last_update_time = pygame.time.get_ticks()  # Get the initial time
@@ -102,6 +105,7 @@ def play():
             dy += player.speed
 
         # Obstacles
+        obstacles_to_remove = []
         for obstacle in world:
             obstacle.rect.x -= dx
             obstacle.rect.y -= dy
@@ -110,10 +114,14 @@ def play():
             centered_y = obstacle.rect.y + offset_y
             # Draw the obstacle at the new, centered position
             obstacle.draw(centered_x, centered_y, CELL_SIZE)
+            
+        obstacles_to_remove = []
         for obstacle in world[:]:
-            if obstacle.image == StickSubstitute_image and player.colliderect(obstacle.rect):
+            if obstacle.image == Stick_image and player.rect.colliderect(obstacle.rect):
                 world.remove(obstacle)  # Remove the stick from the game world
                 STICKS += 1  # Increment the STICKS counter
+        
+        print(STICKS)
 
         # Timer Bar
         current_time = pygame.time.get_ticks()
