@@ -16,7 +16,6 @@ BG = pygame.image.load("C:/Users/Dell/Downloads/Menu-System-PyGame-main/Menu-Sys
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("C:/Users/Dell/Downloads/Menu-System-PyGame-main/Menu-System-PyGame-main/assets/font.ttf", size)
 
-
 SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 600
 MAUVE = (224, 176, 255)
@@ -32,6 +31,7 @@ MAP_SIZE = 100
 def play():
     pygame.init()
     center = MAP_SIZE // 2
+    BAR_VALUE = 50  # Starting at 100%
     
     pygame.display.set_caption("coldFire")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -45,13 +45,11 @@ def play():
         for x in range(center - 2, center + 2):
             MAP[y][x] = 3  # Representing the blue block
     
-    
     map_width = len(MAP[0]) * CELL_SIZE
     map_height = len(MAP) * CELL_SIZE
 
     offset_x = (SCREEN_WIDTH - map_width) // 2
     offset_y = (SCREEN_HEIGHT - map_height) // 2
-
 
     world = []
     Obstacle.spawn_trees_blocks(MAP, 80, 2)
